@@ -1,8 +1,0 @@
-INFO:database.task_repository:Deleting task 5b467a0e-6f4f-43c3-9162-6e69b8d6eccd from all tables...
-INFO:database.task_repository:Executed query: DELETE FROM fed.tb_actions WHERE task_id_ = %s; with params: ('5b467a0e-6f4f-43c3-9162-6e69b8d6eccd',)
-INFO:database.task_repository:Executed query: DELETE FROM fed.tb_tasks_extension WHERE id_ = %s; with params: ('5b467a0e-6f4f-43c3-9162-6e69b8d6eccd',)
-INFO:database.task_repository:Executed query: DELETE FROM fed.tb_passes WHERE task_id_ = %s; with params: ('5b467a0e-6f4f-43c3-9162-6e69b8d6eccd',)
-INFO:database.task_repository:Executed query: DELETE FROM fed.tb_scc_message_id_suffixes WHERE task_id_ = %s; with params: ('5b467a0e-6f4f-43c3-9162-6e69b8d6eccd',)
-INFO:database.task_repository:Executed query: DELETE FROM fed.tb_files WHERE task_id_ = %s; with params: ('5b467a0e-6f4f-43c3-9162-6e69b8d6eccd',)
-INFO:database.task_repository:Executed query: DELETE FROM fed.tb_tasks WHERE id_ = %s; with params: ('5b467a0e-6f4f-43c3-9162-6e69b8d6eccd',)
-INFO:database.task_repository:Transaction committed

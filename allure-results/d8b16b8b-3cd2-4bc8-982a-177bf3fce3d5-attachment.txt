@@ -1,8 +1,0 @@
-INFO:database.task_repository:Deleting task eab49c63-7b5e-41d2-b84e-802731d123d5 from all tables...
-INFO:database.task_repository:Executed query: DELETE FROM fed.tb_actions WHERE task_id_ = %s; with params: ('eab49c63-7b5e-41d2-b84e-802731d123d5',)
-INFO:database.task_repository:Executed query: DELETE FROM fed.tb_tasks_extension WHERE id_ = %s; with params: ('eab49c63-7b5e-41d2-b84e-802731d123d5',)
-INFO:database.task_repository:Executed query: DELETE FROM fed.tb_passes WHERE task_id_ = %s; with params: ('eab49c63-7b5e-41d2-b84e-802731d123d5',)
-INFO:database.task_repository:Executed query: DELETE FROM fed.tb_scc_message_id_suffixes WHERE task_id_ = %s; with params: ('eab49c63-7b5e-41d2-b84e-802731d123d5',)
-INFO:database.task_repository:Executed query: DELETE FROM fed.tb_files WHERE task_id_ = %s; with params: ('eab49c63-7b5e-41d2-b84e-802731d123d5',)
-INFO:database.task_repository:Executed query: DELETE FROM fed.tb_tasks WHERE id_ = %s; with params: ('eab49c63-7b5e-41d2-b84e-802731d123d5',)
-INFO:database.task_repository:Transaction committed

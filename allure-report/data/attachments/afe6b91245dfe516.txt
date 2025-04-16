@@ -1,2 +1,0 @@
-{"success":true,"taskId":"e9ad9d2b-b53b-4683-9e8c-789577e952e9"}
-https://devapi.ed.rt.ru/edogovor/v2/task/e9ad9d2b-b53b-4683-9e8c-789577e952e9/cancel?reason=OK
