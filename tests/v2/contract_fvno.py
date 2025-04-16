@@ -1,7 +1,7 @@
 import pytest
 import requests
-from api.create import Create
-# from api.provide import Provide
+from common_api.create import Create
+# from common_api.provide import Provide
 from data import Data
 import helper
 from http import HTTPStatus
@@ -541,7 +541,7 @@ class TestE2EContractFvno:
         # TODO проверить статус задачи COMPLETED  базе
         # TODO отсутствие ошибок в логе
         # TODO проверить логи выборочно???
-        # TODO проверить токен в камунде??? через базу или через api???
+        # TODO проверить токен в камунде??? через базу или через common_api???
 
     source_value = ['CRM_SIBERIA_V2']
     type_task = ['CONTRACT_FVNO']

@@ -5,19 +5,20 @@ from requests import Response, Session
 
 
 class EmailConfirmPage(BaseAPI):
-    _response: Response
+    _response: dict
 
     def __init__(self, session: Session):
         super().__init__(session)
 
     def get_email(self) -> Response:
-        self._response = self.get(
+        response = self.get(
             "contract",
             {"fields[]": "email"}
         )
-        assert self._response.status_code == HTTPStatus.OK
-        assert self._response.json().get("contents")
-        return self._response
+        assert response.status_code == HTTPStatus.OK
+        assert response.json().get("contents")
+        self._response = response.json()
+        return response
 
     def confirm_email(self) -> Response:
         response = self.post(
@@ -28,16 +29,17 @@ class EmailConfirmPage(BaseAPI):
         return response
 
     def next(self, code: str, view: str) -> Response:
+        contents = self._response.get("contents", {})
         payload = {
             "data": {
                 "code": code,
-                "email": self._response.json().get("contents", {}).get("email", {}).get("value")
+                "email": contents.get("email", {}).get("value")
             },
-            "view": view
+            "from": view
         }
         response = self.post(
             "contract/fvno/email-confirm/next",
-            payload
+            payload=payload
         )
         assert response.status_code == HTTPStatus.OK
         assert response.json().get("status") == "success"

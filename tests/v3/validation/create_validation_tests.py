@@ -5,7 +5,7 @@ from data import Data_doc
 import requests
 import pytest
 import helper
-from api.create import Create
+from common_api.create import Create
 from http import HTTPStatus
 from jsonschema import validate
 import allure

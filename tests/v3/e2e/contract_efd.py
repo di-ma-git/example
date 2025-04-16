@@ -1,7 +1,7 @@
 import pytest
 import requests
-from api.create import Create
-# from api.provide import Provide
+from common_api.create import Create
+# from common_api.provide import Provide
 from data import Data
 import helper
 from http import HTTPStatus

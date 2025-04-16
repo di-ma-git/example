@@ -1,7 +1,7 @@
 import pytest
 import requests
-from api.create import Create
-# from api.provide import Provide
+from common_api.create import Create
+# from common_api.provide import Provide
 from data import Data
 import helper
 from http import HTTPStatus
@@ -17,7 +17,14 @@ from tests.v2.pom.login_page import LoginPage
 from tests.v2.pom.offer_page import OfferPage
 from tests.v2.pom.client_page import ClientPage
 from tests.v2.pom.email_confirm_page import EmailConfirmPage
-
+from tests.v2.pom.document_primary_page import DocumentPrimaryPage
+from tests.v2.pom.address_page import AddressPage
+from tests.v2.pom.equipment_page import EquipmentPage
+from tests.v2.pom.waiting_page import WaitingPage
+from tests.v2.pom.pdf_preview_page import PdfPreviewPage
+from tests.v2.pom.employee_confirm_page import EmployeeConfirmPage
+from tests.v2.pom.client_signature_page import ClientSignature
+from common_api.upload import Upload
 
 
 class TestE2EContractFvno:
@@ -43,6 +50,13 @@ class TestE2EContractFvno:
         self.offer_page = OfferPage(session)
         self.client_page = ClientPage(session)
         self.email_confirm_page = EmailConfirmPage(session)
+        self.document_primary_page = DocumentPrimaryPage(session)
+        self.address_page = AddressPage(session)
+        self.equipment_page = EquipmentPage(session)
+        self.waiting_page = WaitingPage(session)
+        self.pdf_preview_page = PdfPreviewPage(session)
+        self.employee_confirm_page = EmployeeConfirmPage(session)
+        self.client_signature_page = ClientSignature(session)
 
     @pytest.mark.parametrize('source_value', source_value)
     @pytest.mark.parametrize('type_task', type_task)
@@ -69,7 +83,7 @@ class TestE2EContractFvno:
         assert self._current_view == "FVNOOffer"
 
         self.offer_page.settings()
-        self.offer_page.next(self._current_view) # падает тест, возможно надо добавить вейтинги или слипы, проверь работу ретраев
+        self.offer_page.next(self._current_view)
         step = self.offer_page.step()
         self._current_view = step.json().get("contents", {}).get("view")
         assert self._current_view == "FVNOClient"
@@ -82,359 +96,75 @@ class TestE2EContractFvno:
 
         self.email_confirm_page.get_email()
         self.email_confirm_page.confirm_email()
-        task_repository.get_confirm_email_code_by_task_id(self._task_id)
-        self.email_confirm_page.next(task_repository.get_confirm_email_code_by_task_id(self._task_id),
-                                     self._current_view)
+        time.sleep(1)
+        code = task_repository.get_confirm_email_code_by_task_id(self._task_id)
+        self.email_confirm_page.next(code, self._current_view)
         step = self.email_confirm_page.step()
         self._current_view = step.json().get("contents", {}).get("view")
         assert self._current_view == "UniformDocumentPrimary"
 
-        result_contract_get = requests.get(
-            "http://devapp.homeinternet.rt.ru/api/v1/contract?" +
-            "fields%5B%5D=email",
-            headers=self._headers_front_with_auth,
-            verify=False
-        )
-        assert result_contract_get.status_code == HTTPStatus.OK
-        assert result_contract_get.json().get("contents")
-        time.sleep(1)
+        nationality = self.document_primary_page.get_nationality()
+        assert self._nationality == nationality.json().get("contents", {}).get("nationality", {}).get("value")
+        self.document_primary_page.get_document_primary()
+        self.document_primary_page.next(self._current_view)
+        step = self.document_primary_page.step()
+        self._current_view = step.json().get("contents", {}).get("view")
+        assert self._current_view == "FVNOAddress"
 
-        result_email_confirm_post = requests.post(
-            "http://devapp.homeinternet.rt.ru/api/v1/contract/fvno/email-confirm",
-            headers=self._headers_front_with_auth,
-            verify=False
-        )
-        assert result_email_confirm_post.status_code == HTTPStatus.OK
-        assert result_email_confirm_post.json().get("contents")
-        time.sleep(1)
+        self.address_page.get_addresses()
+        self.address_page.next(self._current_view)
+        step = self.address_page.step()
+        self._current_view = step.json().get("contents", {}).get("view")
+        assert self._current_view == "FVNOEquipment"
 
-        # TODO взят из базы код для подтверждения email, записать в переменную
-        self._confirm_email_code = task_repository.get_confirm_email_code_by_task_id(self._task_id)
-
-        payload_email_confirm_next_post = {"data": {"code": f"{self._confirm_email_code}", "email": "maltsev.d@rt.ru"},
-                                           "from": f"{self._view}"}
-
-        result_email_confirm_next_post = requests.post(
-            "http://devapp.homeinternet.rt.ru/api/v1/contract/fvno/email-confirm/next",
-            headers=self._headers_front_with_auth,
-            json=payload_email_confirm_next_post,
-            verify=False
-        )
-        assert result_email_confirm_next_post.status_code == HTTPStatus.OK
-        assert result_email_confirm_next_post.json().get("status") == "success"
-        time.sleep(1)
-
-        result_step_get = requests.get(
-            "http://devapp.homeinternet.rt.ru/api/v1/step",
-            headers=self._headers_front_with_auth,
-            verify=False
-        )
-        assert result_step_get.status_code == HTTPStatus.OK
-        assert result_step_get.json().get("contents", {}).get("view") == "UniformDocumentPrimary"
-        self._view = result_step_get.json().get("contents", {}).get("view")
-        time.sleep(1)
-
-        result_nationality_get = requests.get(
-            "http://devapp.homeinternet.rt.ru/api/v1/contract?fields%5B%5D=nationality",
-            headers=self._headers_front_with_auth,
-            verify=False
-        )
-        assert result_nationality_get.status_code == HTTPStatus.OK
-        assert result_nationality_get.json().get("contents", {}).get("nationality", {}).get(
-            "value") == self._nationality
-        time.sleep(1)
-
-        result_document_primary_get = requests.get(
-            "http://devapp.homeinternet.rt.ru/api/v1/contract/uniform/document-primary",
-            headers=self._headers_front_with_auth,
-            verify=False
-        )
-        assert result_document_primary_get.status_code == HTTPStatus.OK
-        assert result_document_primary_get.json().get("contents", {}).get("document")
-        time.sleep(1)
-
-        payload_document_primary_next_get = {
-            "data": {
-                "document": {
-                    "type": "PASSPORT_RU",
-                    "affiliation": "CLIENT",
-                    "fullName": None,
-                    "series": "1814",
-                    "number": "979498",
-                    "departmentCode": "760-014",
-                    "placeOfIssue": "УМВД",
-                    "dateOfIssue": "06.04.2015",
-                    "expirationDate": None,
-                    "dateOfBirth": "03.12.1991",
-                    "placeOfBirth": "Нижний Новгород",
-                    "readOnly": [
-                        "series",
-                        "number"
-                    ]
-                }
-            },
-            "from": "UniformDocumentPrimary"
-        }
-        result_document_primary_next_get = requests.post(
-            "http://devapp.homeinternet.rt.ru/api/v1/contract/uniform/document-primary/next",
-            headers=self._headers_front_with_auth,
-            json=payload_document_primary_next_get,
-            verify=False
-        )
-        assert result_document_primary_next_get.status_code == HTTPStatus.OK
-        assert result_email_confirm_next_post.json().get("status") == "success"
-        time.sleep(1)
-
-        result_step_get = requests.get(
-            "http://devapp.homeinternet.rt.ru/api/v1/step",
-            headers=self._headers_front_with_auth,
-            verify=False
-        )
-        assert result_step_get.status_code == HTTPStatus.OK
-        assert result_step_get.json().get("contents", {}).get("view") == "FVNOAddress"
-        self._view = result_step_get.json().get("contents", {}).get("view")
-        time.sleep(1)
-
-        result_contract_addresses_get = requests.get(
-            "http://devapp.homeinternet.rt.ru/api/v1/contract?" +
-            "fields%5B%5D=installationAddressFlat&" +
-            "fields%5B%5D=installationAddressGlobalId&" +
-            "fields%5B%5D=installationAddressHouse&" +
-            "fields%5B%5D=installationAddressManual&" +
-            "fields%5B%5D=installationAddressRegion&" +
-            "fields%5B%5D=installationAddressStreet&" +
-            "fields%5B%5D=installationAddressSuggestions&" +
-            "fields%5B%5D=installationAddressTown&" +
-            "fields%5B%5D=installationAddressZipCode&" +
-            "fields%5B%5D=nationality&" +
-            "fields%5B%5D=registrationAddressFlat&" +
-            "fields%5B%5D=registrationAddressGlobalId&" +
-            "fields%5B%5D=registrationAddressHouse&" +
-            "fields%5B%5D=registrationAddressManual&" +
-            "fields%5B%5D=registrationAddressRegion&" +
-            "fields%5B%5D=registrationAddressStreet&" +
-            "fields%5B%5D=registrationAddressSuggestions&" +
-            "fields%5B%5D=registrationAddressTown&" +
-            "fields%5B%5D=registrationAddressZipCode",
-            headers=self._headers_front_with_auth,
-            verify=False
-        )
-        assert result_contract_addresses_get.status_code == HTTPStatus.OK
-        assert result_contract_addresses_get.json().get("contents")
-        time.sleep(1)
-
-        payload_next_post = {
-            "data": {
-                "registrationAddressFlat": f"{result_contract_addresses_get.json().get("contents", {}).get("registrationAddressFlat", {}).get("value")}",
-                "registrationAddressGlobalId": f"{result_contract_addresses_get.json().get("contents", {}).get("registrationAddressGlobalId", {}).get("value")}",
-                "registrationAddressHouse": f"{result_contract_addresses_get.json().get("contents", {}).get("registrationAddressHouse", {}).get("value")}",
-                "registrationAddressManual": f"{result_contract_addresses_get.json().get("contents", {}).get("registrationAddressManual", {}).get("value")}",
-                "registrationAddressRegion": f"{result_contract_addresses_get.json().get("contents", {}).get("registrationAddressRegion", {}).get("value")}",
-                "registrationAddressStreet": f"{result_contract_addresses_get.json().get("contents", {}).get("registrationAddressStreet", {}).get("value")}",
-                "registrationAddressSuggestions": f"{result_contract_addresses_get.json().get("contents", {}).get("registrationAddressSuggestions", {}).get("value")}",
-                "registrationAddressTown": f"{result_contract_addresses_get.json().get("contents", {}).get("registrationAddressTown", {}).get("value")}",
-                "registrationAddressZipCode": f"{result_contract_addresses_get.json().get("contents", {}).get("registrationAddressZipCode", {}).get("value")}"
-            },
-            "from": f"{self._view}"
-        }
-        result_next_post = requests.post(
-            "http://devapp.homeinternet.rt.ru/api/v1/contract/fvno/offer/next",
-            headers=self._headers_front_with_auth,
-            json=payload_next_post,
-            verify=False
-        )
-        assert result_next_post.status_code == HTTPStatus.OK
-        assert result_next_post.json().get("status") == "success"
-        time.sleep(1)
-
-        result_step_get = requests.get(
-            "http://devapp.homeinternet.rt.ru/api/v1/step",
-            headers=self._headers_front_with_auth,
-            verify=False
-        )
-        assert result_step_get.status_code == HTTPStatus.OK
-        assert result_step_get.json().get("contents", {}).get("view") == "FVNOEquipment"
-        self._view = result_step_get.json().get("contents", {}).get("view")
-        time.sleep(1)
-
-        result_equipment_get = requests.get(
-            "http://devapp.homeinternet.rt.ru/api/v1/contract/fvno/equipment",
-            headers=self._headers_front_with_auth,
-            verify=False
-        )
-        assert result_equipment_get.status_code == HTTPStatus.OK
-        assert result_equipment_get.json().get("contents")
-        time.sleep(1)
-
-        payload_alternative_post = {"from": f"{self._view}"}
-        result_alternative_post = requests.post(
-            "http://devapp.homeinternet.rt.ru/api/v1/contract/fvno/equipment/alternative",
-            headers=self._headers_front_with_auth,
-            json=payload_alternative_post,
-            verify=False
-        )
-        assert result_alternative_post.status_code == HTTPStatus.OK
-        assert result_alternative_post.json().get("status") == "success"
-        time.sleep(1)
-
-        result_step_get = requests.get(
-            "http://devapp.homeinternet.rt.ru/api/v1/step",
-            headers=self._headers_front_with_auth,
-            verify=False
-        )
-        assert result_step_get.status_code == HTTPStatus.OK
-        assert result_step_get.json().get("contents", {}).get("view") == "FVNOWaiting"
-        self._view = result_step_get.json().get("contents", {}).get("view")
-        time.sleep(3)
+        self.equipment_page.get_equipment()
+        self.equipment_page.alternative(self._current_view)
+        step = self.equipment_page.step()
+        self._current_view = step.json().get("contents", {}).get("view")
+        assert self._current_view == "FVNOWaiting" # добавить проверку progress
 
         # UPLOAD
-        result_upload_post = requests.post(
-            f"{urls.BASE_URL_DEV}{urls.CREATE_TASK}{self._task_id}{urls.UPLOAD}",
-            headers=Data.headers2,
-            json=Data.data_upload_file_links_ural,
-            verify=False
-        )
-        assert result_upload_post.status_code == HTTPStatus.OK
-        assert result_upload_post.json().get('success') == True
-
-        # TODO возможно тут нужен waiting
+        response_upload = Upload.common_upload(self._task_id, source_value)
+        assert response_upload.status_code == HTTPStatus.OK
+        assert response_upload.json().get('success') == True
         time.sleep(10)
 
-        result_step_get = requests.get(
-            "http://devapp.homeinternet.rt.ru/api/v1/step",
-            headers=self._headers_front_with_auth,
-            verify=False
-        )
-        assert result_step_get.status_code == HTTPStatus.OK
-        assert result_step_get.json().get("contents", {}).get("view") == "FVNOPdfPreview"
-        self._view = result_step_get.json().get("contents", {}).get("view")
-        time.sleep(1)
+        step = self.waiting_page.step()
+        self._current_view = step.json().get("contents", {}).get("view")
+        assert self._current_view == "FVNOWaiting"
 
-        result_contract_files_get = requests.get(
-            "http://devapp.homeinternet.rt.ru/api/v1/contract?fields%5B%5D=files",
-            headers=self._headers_front_with_auth,
-            verify=False
-        )
-        assert result_contract_files_get.status_code == HTTPStatus.OK
-        assert result_contract_files_get.json().get("contents")
-        time.sleep(1)
+        self.pdf_preview_page.get_files()
+        self.pdf_preview_page.next(self._current_view)
+        step = self.document_primary_page.step()
+        self._current_view = step.json().get("contents", {}).get("view")
+        assert self._current_view == "FVNOEmployeeConfirm"
 
-        payload_pdf_preview_next_post = {"from": f"{self._view}"}
-        result_pdf_preview_next_post = requests.post(
-            "http://devapp.homeinternet.rt.ru/api/v1/contract/fvno/pdf-preview/next",
-            headers=self._headers_front_with_auth,
-            json=payload_pdf_preview_next_post,
-            verify=False
-        )
-        assert result_pdf_preview_next_post.status_code == HTTPStatus.OK
-        assert result_pdf_preview_next_post.json().get("status") == "success"
-        time.sleep(1)
+        self.employee_confirm_page.get_client_document()
+        self.employee_confirm_page.employee_confirm()
+        # TODO на тесте нужно брать код смс подтверждения из базы
+        self.employee_confirm_page.next(self._installer_code, self._current_view)
+        step = self.employee_confirm_page.step()
+        self._current_view = step.json().get("contents", {}).get("view")
+        assert self._current_view == "FVNOSignature"
 
-        result_step_get = requests.get(
-            "http://devapp.homeinternet.rt.ru/api/v1/step",
-            headers=self._headers_front_with_auth,
-            verify=False
-        )
-        assert result_step_get.status_code == HTTPStatus.OK
-        assert result_step_get.json().get("contents", {}).get("view") == "FVNOEmployeeConfirm"
-        self._view = result_step_get.json().get("contents", {}).get("view")
-        time.sleep(1)
-
-        result_contract_installer_confirm_get = requests.get(
-            "http://devapp.homeinternet.rt.ru/api/v1/contract?" +
-            "fields%5B%5D=attorney&" +
-            "fields%5B%5D=attorneyDocument&" +
-            "fields%5B%5D=documentPrimary&" +
-            "fields%5B%5D=documentSecondary&" +
-            "fields%5B%5D=middleName&" +
-            "fields%5B%5D=name&" +
-            "fields%5B%5D=surname",
-            headers=self._headers_front_with_auth,
-            verify=False
-        )
-        assert result_contract_installer_confirm_get.status_code == HTTPStatus.OK
-        assert result_contract_installer_confirm_get.json().get("contents")
-        time.sleep(1)
-
-        result_contract_employee_confirm_get = requests.get(
-            "http://devapp.homeinternet.rt.ru/api/v1/contract/fvno/employee-confirm",
-            headers=self._headers_front_with_auth,
-            verify=False
-        )
-        assert result_contract_employee_confirm_get.status_code == HTTPStatus.OK
-        assert result_contract_employee_confirm_get.json().get("contents")
-        time.sleep(1)
-
-        payload_employee_confirm_next_post = {"data": {"code": f"{self._installer_code}"}, "from": f"{self._view}"}
-        result_employee_confirm_next_post = requests.post(
-            "http://devapp.homeinternet.rt.ru/api/v1/contract/fvno/employee-confirm/next",
-            headers=self._headers_front_with_auth,
-            json=payload_employee_confirm_next_post,
-            verify=False
-        )
-        assert result_employee_confirm_next_post.status_code == HTTPStatus.OK
-        assert result_employee_confirm_next_post.json().get("status") == "success"
-        time.sleep(1)
-
-        result_step_get = requests.get(
-            "http://devapp.homeinternet.rt.ru/api/v1/step",
-            headers=self._headers_front_with_auth,
-            verify=False
-        )
-        assert result_step_get.status_code == HTTPStatus.OK
-        assert result_step_get.json().get("contents", {}).get("view") == "FVNOSignature"
-        self._view = result_step_get.json().get("contents", {}).get("view")
-        time.sleep(1)
-
-        result_signature_post = requests.post(
-            "http://devapp.homeinternet.rt.ru/api/v1/contract/fvno/signature",
-            headers=self._headers_front_with_auth,
-            verify=False
-        )
-        assert result_signature_post.status_code == HTTPStatus.OK
-        assert result_signature_post.json().get("contents")
-        time.sleep(1)
-        # TODO возможно нужно взять код смс подтверждения из базы
-
-        payload_signature_next_post = {"data": {"code": "333333"}, "from": f"{self._view}", "source": "web"}
-        result_signature_next_post = requests.post(
-            "http://devapp.homeinternet.rt.ru/api/v1/contract/fvno/signature/next",
-            headers=self._headers_front_with_auth,
-            json=payload_signature_next_post,
-            verify=False
-        )
-        assert result_signature_next_post.status_code == HTTPStatus.OK
-        assert result_signature_next_post.json().get("status") == "success"
-        time.sleep(1)
-
-        result_step_get = requests.get(
-            "http://devapp.homeinternet.rt.ru/api/v1/step",
-            headers=self._headers_front_with_auth,
-            verify=False
-        )
-        assert result_step_get.status_code == HTTPStatus.OK
-        assert result_step_get.json().get("contents", {}).get("view") == "FVNOComplete"
-        self._view = result_step_get.json().get("contents", {}).get("view")
-        time.sleep(3)
+        self.client_signature_page.signature()
+        self.client_signature_page.next(self._current_view)
+        step = self.client_signature_page.step()
+        self._current_view = step.json().get("contents", {}).get("view")
+        assert self._current_view == "FVNOComplete"
 
         # UPLOAD
-        result_upload_post = requests.post(
-            f"{urls.BASE_URL_DEV}{urls.CREATE_TASK}{self._task_id}{urls.UPLOAD}",
-            headers=Data.headers2,
-            json=Data.data_upload_file_links_ural,
-            verify=False
-        )
-        assert result_upload_post.status_code == HTTPStatus.OK
-        assert result_upload_post.json().get('success') == True
+        response_upload = Upload.common_upload(self._task_id, source_value)
+        assert response_upload.status_code == HTTPStatus.OK
+        assert response_upload.json().get('success') == True
         time.sleep(10)
 
         assert task_repository.get_task_status(self._task_id) == 'COMPLETED'
         task_repository.delete_task_by_task_id_from_all_tables(self._task_id)
 
-        # TODO проверить статус задачи COMPLETED  базе
-        # TODO отсутствие ошибок в логе
+        # TODO проверка отсутствия ошибок в логе
         # TODO проверить логи выборочно???
-        # TODO проверить токен в камунде??? через базу или через api???
+        # TODO проверить токен в камунде??? через базу или через common_api???
 
     source_value = ['CRM_SIBERIA_V2']
     type_task = ['CONTRACT_FVNO']

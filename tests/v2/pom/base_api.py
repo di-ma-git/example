@@ -15,29 +15,53 @@ class BaseAPI:
         self.base_url = base_url if base_url else urls.BASE_URL_FVNO
         self.headers = headers or Data.headers_front
         self.session.headers.update(self.headers)
-        self.session.mount("http://", HTTPAdapter(max_retries=Retry(total=14, backoff_factor=3))) # вернуть тотал = 3
+        self.session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=3)))
 
     def get(self, path: str, params: dict = None) -> Response:
         response = self.session.get(
             f"{self.base_url}{path}",
             headers=self.headers,
             params=params,
-            verify=False
+            verify=False,
+            timeout=(10, 30)
         )
         response.raise_for_status()
         return response
 
-    def post(self, path: str, payload: dict = None) -> Response:
-        response = self.session.post(
-            f"{self.base_url}{path}",
-            headers=self.headers,
-            json=payload,
-            verify=False
-        )
-        response.raise_for_status()
-        return response
+    def post(self, path: str, payload: dict = None, data: str = None) -> Response:
+        if payload is not None:
+            response = self.session.post(
+                f"{self.base_url}{path}",
+                headers=self.headers,
+                json=payload,
+                verify=False,
+                timeout=(10, 30)
+            )
+            response.raise_for_status()
+            return response
+
+        elif data is not None:
+            response = self.session.post(
+                f"{self.base_url}{path}",
+                headers=self.headers,
+                data=data,
+                verify=False,
+                timeout=(10, 30)
+            )
+            response.raise_for_status()
+            return response
+        else:
+            response = self.session.post(
+                f"{self.base_url}{path}",
+                headers=self.headers,
+                verify=False,
+                timeout=(10, 30)
+            )
+            response.raise_for_status()
+            return response
 
     def step(self) -> Response:
         response = self.get("step")
         assert response.status_code == HTTPStatus.OK
+        response.raise_for_status()
         return response

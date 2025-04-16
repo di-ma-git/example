@@ -5,7 +5,7 @@ from requests import Response, Session
 
 
 class ClientPage(BaseAPI):
-    _response: Response
+    _response: dict
 
     def __init__(self, session: Session):
         super().__init__(session)
@@ -26,35 +26,40 @@ class ClientPage(BaseAPI):
                 "surname"
             ]
         }
-        self._response = self.get(
+        response = self.get(
             "contract",
             params
         )
-        assert self._response.status_code == HTTPStatus.OK
-        assert self._response.json().get("contents")
-        return self._response
+        assert response.status_code == HTTPStatus.OK
+        assert response.json().get("contents")
+        self._response = response.json()
+        return response
 
     def next(self, view: str) -> Response:
+        contents = self._response.get("contents")
+
         payload = {
             "data": {
-                "codeWord": f"{self._response.json().get("contents", {}).get("codeWord", {}).get("value")}",
-                "consentToSmsInform": f"{self._response.json().get("contents", {}).get("consentToSmsInform", {}).get("value")}",
-                "email": f"{self._response.json().get("contents", {}).get("email", {}).get("value")}",
-                "inn": f"{self._response.json().get("contents", {}).get("inn", {}).get("value")}",
-                "middleName": f"{self._response.json().get("contents", {}).get("middleName", {}).get("value")}",
-                "name": f"{self._response.json().get("contents", {}).get("name", {}).get("value")}",
-                "nationality": f"{self._response.json().get("contents", {}).get("nationality", {}).get("value")}",
-                "phone": f"{self._response.json().get("contents", {}).get("phone", {}).get("value")}",
-                "sex": f"{self._response.json().get("contents", {}).get("sex", {}).get("value")}",
-                "snils": f"{self._response.json().get("contents", {}).get("snils", {}).get("value")}",
-                "surname": f"{self._response.json().get("contents", {}).get("surname", {}).get("value")}"
+                "codeWord": contents.get("codeWord", {}).get("value"),
+                "consentToSmsInform": contents.get("consentToSmsInform", {}).get("value"),
+                "email": contents.get("email", {}).get("value"),
+                "inn": contents.get("inn", {}).get("value"),
+                "middleName": contents.get("middleName", {}).get("value"),
+                "name": contents.get("name", {}).get("value"),
+                "nationality": contents.get("nationality", {}).get("value"),
+                "phone": contents.get("phone", {}).get("value"),
+                "sex": contents.get("sex", {}).get("value"),
+                "snils": contents.get("snils", {}).get("value"),
+                "surname": contents.get("surname", {}).get("value")
             },
-            "from": f"{view}"
+            "from": view
         }
+        payload_str = json.dumps(payload, ensure_ascii=False)
         response = self.post(
             "contract/fvno/client/next",
-            payload
+            payload=payload
         )
         assert response.status_code == HTTPStatus.OK
         assert response.json().get("status") == "success"
         return response
+
