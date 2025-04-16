@@ -1,0 +1,13 @@
+BASE_URL_DEV = 'https://devapi.ed.rt.ru'
+BASE_URL_TEST = 'https://testapi.ed.rt.ru'
+CREATE_TASK = '/edogovor/v1/task/'
+CREATE_TASK_V2 = '/edogovor/v2/task/'
+CREATE_TASK_V3 = '/edogovor/v3/task/'
+SEARCH_V1 = '/edogovor/v1/task/search?identificationValue='
+SEARCH_V2 = '/edogovor/v2/task/search?account='
+SEARCH_V3_ONE_PART = '/edogovor/v3/task/search?account='
+SEARCH_V3_TWO_PART = '&order='
+SEARCH_V4 = '/edogovor/v4/task/search?phone='
+UPLOAD = '/fileLinks'
+
+BASE_URL_FVNO='http://devapp.homeinternet.rt.ru/api/v1/'

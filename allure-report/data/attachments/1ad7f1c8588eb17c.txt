@@ -1,0 +1,8 @@
+INFO:database.task_repository:Deleting task 7416e195-941c-4321-a390-df644791d2b4 from all tables...
+INFO:database.task_repository:Executed query: DELETE FROM fed.tb_actions WHERE task_id_ = %s; with params: ('7416e195-941c-4321-a390-df644791d2b4',)
+INFO:database.task_repository:Executed query: DELETE FROM fed.tb_tasks_extension WHERE id_ = %s; with params: ('7416e195-941c-4321-a390-df644791d2b4',)
+INFO:database.task_repository:Executed query: DELETE FROM fed.tb_passes WHERE task_id_ = %s; with params: ('7416e195-941c-4321-a390-df644791d2b4',)
+INFO:database.task_repository:Executed query: DELETE FROM fed.tb_scc_message_id_suffixes WHERE task_id_ = %s; with params: ('7416e195-941c-4321-a390-df644791d2b4',)
+INFO:database.task_repository:Executed query: DELETE FROM fed.tb_files WHERE task_id_ = %s; with params: ('7416e195-941c-4321-a390-df644791d2b4',)
+INFO:database.task_repository:Executed query: DELETE FROM fed.tb_tasks WHERE id_ = %s; with params: ('7416e195-941c-4321-a390-df644791d2b4',)
+INFO:database.task_repository:Transaction committed

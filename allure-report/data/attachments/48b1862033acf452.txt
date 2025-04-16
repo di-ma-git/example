@@ -1,0 +1,8 @@
+INFO:database.task_repository:Deleting task 6ffd27ae-ca5b-424b-bc2a-d9f3e5a85d01 from all tables...
+INFO:database.task_repository:Executed query: DELETE FROM fed.tb_actions WHERE task_id_ = %s; with params: ('6ffd27ae-ca5b-424b-bc2a-d9f3e5a85d01',)
+INFO:database.task_repository:Executed query: DELETE FROM fed.tb_tasks_extension WHERE id_ = %s; with params: ('6ffd27ae-ca5b-424b-bc2a-d9f3e5a85d01',)
+INFO:database.task_repository:Executed query: DELETE FROM fed.tb_passes WHERE task_id_ = %s; with params: ('6ffd27ae-ca5b-424b-bc2a-d9f3e5a85d01',)
+INFO:database.task_repository:Executed query: DELETE FROM fed.tb_scc_message_id_suffixes WHERE task_id_ = %s; with params: ('6ffd27ae-ca5b-424b-bc2a-d9f3e5a85d01',)
+INFO:database.task_repository:Executed query: DELETE FROM fed.tb_files WHERE task_id_ = %s; with params: ('6ffd27ae-ca5b-424b-bc2a-d9f3e5a85d01',)
+INFO:database.task_repository:Executed query: DELETE FROM fed.tb_tasks WHERE id_ = %s; with params: ('6ffd27ae-ca5b-424b-bc2a-d9f3e5a85d01',)
+INFO:database.task_repository:Transaction committed

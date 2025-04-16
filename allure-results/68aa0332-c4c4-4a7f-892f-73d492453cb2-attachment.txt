@@ -1,0 +1,8 @@
+[32mINFO    [0m database.task_repository:task_repository.py:38 Deleting task 5b467a0e-6f4f-43c3-9162-6e69b8d6eccd from all tables...
+[32mINFO    [0m database.task_repository:task_repository.py:41 Executed query: DELETE FROM fed.tb_actions WHERE task_id_ = %s; with params: ('5b467a0e-6f4f-43c3-9162-6e69b8d6eccd',)
+[32mINFO    [0m database.task_repository:task_repository.py:41 Executed query: DELETE FROM fed.tb_tasks_extension WHERE id_ = %s; with params: ('5b467a0e-6f4f-43c3-9162-6e69b8d6eccd',)
+[32mINFO    [0m database.task_repository:task_repository.py:41 Executed query: DELETE FROM fed.tb_passes WHERE task_id_ = %s; with params: ('5b467a0e-6f4f-43c3-9162-6e69b8d6eccd',)
+[32mINFO    [0m database.task_repository:task_repository.py:41 Executed query: DELETE FROM fed.tb_scc_message_id_suffixes WHERE task_id_ = %s; with params: ('5b467a0e-6f4f-43c3-9162-6e69b8d6eccd',)
+[32mINFO    [0m database.task_repository:task_repository.py:41 Executed query: DELETE FROM fed.tb_files WHERE task_id_ = %s; with params: ('5b467a0e-6f4f-43c3-9162-6e69b8d6eccd',)
+[32mINFO    [0m database.task_repository:task_repository.py:41 Executed query: DELETE FROM fed.tb_tasks WHERE id_ = %s; with params: ('5b467a0e-6f4f-43c3-9162-6e69b8d6eccd',)
+[32mINFO    [0m database.task_repository:task_repository.py:44 Transaction committed
