@@ -68,7 +68,6 @@ class TestE2EContractFvno:
         self._test_params["installer_code"] = data['data']['content']['contract']['installerCode']
         self._test_params["instance_id"] = CamundaAPI.get_instance_id_by_business_key(self._test_params.get("task_id"))
         time.sleep(1)
-
         self.register_page.register(self._test_params.get("identification_value"), self._test_params.get("instance_id"))
         assert task_repository.get_task_status(self._test_params.get("task_id")) == "ACTIVE"
 
