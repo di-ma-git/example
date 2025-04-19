@@ -1,7 +1,5 @@
-from http import HTTPStatus
-
-from requests import Session, Response
-from tests.v2.pom.base_api import BaseAPI
+from requests import Session
+from common_api.base_api import BaseAPI
 
 
 class WaitingPage(BaseAPI):

@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
 from requests import Session, Response
-from tests.v2.pom.base_api import BaseAPI
+from common_api.base_api import BaseAPI
 
 
 class DocumentPrimaryPage(BaseAPI):
@@ -10,13 +10,14 @@ class DocumentPrimaryPage(BaseAPI):
     def __init__(self, session: Session):
         super().__init__(session)
 
-    def get_nationality(self) -> Response:
+    def get_nationality(self, nationality: str) -> Response:
         params = {"fields[]": ["nationality"]}
         response = self.get(
             "contract",
             params
         )
         assert response.status_code == HTTPStatus.OK
+        assert response.json().get("contents", {}).get("nationality", {}).get("value") == nationality
         return response
 
     def get_document_primary(self) -> Response:

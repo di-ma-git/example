@@ -5,7 +5,27 @@ from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 import urls
 from data import Data
+import logging
 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+
+class LoggingHTTPAdapter(HTTPAdapter):
+    def send(self, request, **kwargs):
+        attempt = 1
+        while True:
+            try:
+                logger.debug(f"Try {attempt}: Sending request to {request.url}")
+                response = super().send(request, **kwargs)
+                logger.debug(f"Try {attempt}: Server response {response.status_code}")
+                return response
+            except Exception as e:
+                logger.debug(f"Try {attempt}: error - {e}")
+                if attempt >= self.max_retries.total:
+                    logger.error("The maximum number of attempts has been reached")
+                    raise
+                attempt += 1
 
 
 class BaseAPI:
@@ -15,48 +35,53 @@ class BaseAPI:
         self.base_url = base_url if base_url else urls.BASE_URL_FVNO
         self.headers = headers or Data.headers_front
         self.session.headers.update(self.headers)
-        self.session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=3)))
+        self.session.mount("http://", LoggingHTTPAdapter(max_retries=Retry(total=3, backoff_factor=3)))
 
     def get(self, path: str, params: dict = None) -> Response:
+        logger.info(f"Get request to {path} with params {params}")
         response = self.session.get(
             f"{self.base_url}{path}",
             headers=self.headers,
             params=params,
-            verify=False,
-            timeout=(10, 30)
+            verify=False
         )
+        logger.info(f"Response: {response}")
         response.raise_for_status()
         return response
 
     def post(self, path: str, payload: dict = None, data: str = None) -> Response:
+
         if payload is not None:
+            logger.info(f"POST request to {path} with payload {payload}")
             response = self.session.post(
                 f"{self.base_url}{path}",
                 headers=self.headers,
                 json=payload,
-                verify=False,
-                timeout=(10, 30)
+                verify=False
             )
+            logger.info(f"Response: {response}")
             response.raise_for_status()
             return response
 
         elif data is not None:
+            logger.info(f"POST request to {path} with payload {data}")
             response = self.session.post(
                 f"{self.base_url}{path}",
                 headers=self.headers,
                 data=data,
-                verify=False,
-                timeout=(10, 30)
+                verify=False
             )
+            logger.info(f"Response: {response}")
             response.raise_for_status()
             return response
         else:
+            logger.info(f"POST request to {path} without payload")
             response = self.session.post(
                 f"{self.base_url}{path}",
                 headers=self.headers,
-                verify=False,
-                timeout=(10, 30)
+                verify=False
             )
+            logger.info(f"Response: {response}")
             response.raise_for_status()
             return response
 

@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
 from requests import Session, Response
-from tests.v2.pom.base_api import BaseAPI
+from common_api.base_api import BaseAPI
 
 
 class ClientSignature(BaseAPI):

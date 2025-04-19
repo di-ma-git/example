@@ -36,7 +36,7 @@ class TestCreateValidation:
     ])
     def test_create_success_email_validation(self, task_repository, create_success_schema, source_value, type_task, email):
         with allure.step("Prepare test data for request"):
-            data = helper.ChangeTestDataHelper.modify_payload_body_for_validation(Data.data_convergent_self_v3, source_value, type_task, email)
+            data = helper.ChangeTestDataHelper.modify_payload_body_for_client_validation(Data.data_convergent_self_v3, source_value, type_task, 'email', email)
 
         with allure.step("Send request and check status"):
             response = Create.create_and_cancel_v3(data)
@@ -91,7 +91,7 @@ class TestCreateValidation:
     ])
     def test_create_failed_email_validation(self, task_repository, create_error_schema, source_value, type_task, email):
         with allure.step("Prepare test data for request"):
-            data = helper.ChangeTestDataHelper.modify_payload_body_for_validation(Data.data_convergent_self_v3, source_value, type_task, email)
+            data = helper.ChangeTestDataHelper.modify_payload_body_for_client_validation(Data.data_convergent_self_v3, source_value, type_task, email)
 
         with allure.step("Send request and check status"):
             response = Create.create_and_cancel_v3(data)
@@ -99,3 +99,5 @@ class TestCreateValidation:
 
         with allure.step("Check json schema"):
             validate(instance=response.json(), schema=create_error_schema)
+
+

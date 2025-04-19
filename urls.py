@@ -10,4 +10,5 @@ SEARCH_V3_TWO_PART = '&order='
 SEARCH_V4 = '/edogovor/v4/task/search?phone='
 UPLOAD = '/fileLinks'
 
-BASE_URL_FVNO='http://devapp.homeinternet.rt.ru/api/v1/'
+BASE_URL_FVNO = 'http://devapp.homeinternet.rt.ru/api/v1/'
+CAMUNDA_URL_DEV = 'http://10.42.110.215:8001/rest/process-instance'

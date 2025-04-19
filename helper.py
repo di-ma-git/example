@@ -1,3 +1,5 @@
+import copy
+
 import requests
 from data import MultipartFormData
 from data import Data
@@ -36,14 +38,41 @@ class ChangeTestDataHelper:
 
         return file_info_new
     @staticmethod
-    def modify_payload_body_for_validation(body, source_value, type_task, email):
+    def modify_payload_body_for_client_validation(body, source_value, type_task, field, value):
         body_new = body.copy()
         body_new["data"]["key"] = str(random.randint(1000, 1000000))
         body_new["data"]["source"] = source_value
         body_new["data"]["type"] = type_task
-        body_new["data"]["content"]["client"]["email"] = email
+        body_new["data"]["content"]["client"][field] = value
 
         return body_new
+
+
+    @staticmethod
+    def modify_payload_body_for_validation(body: dict, source_value: str, type_task: str, path_value: dict) -> dict:
+        body_new = copy.deepcopy(body)
+        body_new["data"]["key"] = str(random.randint(1000, 1000000))
+        body_new["data"]["source"] = source_value
+        body_new["data"]["type"] = type_task
+        body_new["data"]["identificationValue"] = "9" + str(random.randint(100000000, 999999999))
+        for field_path, value in path_value.items():
+            keys = field_path.split(".")
+            current = body_new["data"]
+
+            for key in keys[1:-1]:
+                if key not in current:
+                    current[key] = {}
+                current = current[key]
+
+            if value == "отсутствует":
+                if keys[-1] in current:
+                    del current[keys[-1]]
+            else:
+                current[keys[-1]] = value
+
+            return body_new
+
+
 
     @staticmethod
     def modify_payload_fvno(body, source_value, type_task, provider_value):

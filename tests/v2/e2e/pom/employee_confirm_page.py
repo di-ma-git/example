@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
 from requests import Session, Response
-from tests.v2.pom.base_api import BaseAPI
+from common_api.base_api import BaseAPI
 
 
 class EmployeeConfirmPage(BaseAPI):
@@ -13,10 +13,6 @@ class EmployeeConfirmPage(BaseAPI):
     def get_client_document(self) -> Response:
         params = {
             "fields[]": [
-                "attorney",
-                "attorneyDocument",
-                "documentPrimary",
-                "documentSecondary",
                 "middleName",
                 "name",
                 "surname"

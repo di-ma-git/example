@@ -1,36 +1,38 @@
 from http import HTTPStatus
 
 from requests import Session, Response
-from tests.v2.pom.base_api import BaseAPI
+from common_api.base_api import BaseAPI
 
 
-class PdfPreviewPage(BaseAPI):
+class EquipmentPage(BaseAPI):
     _response: dict
 
     def __init__(self, session: Session):
         super().__init__(session)
 
-    def get_files(self) -> Response:
-        params = {
-            "fields[]": [
-                "files"
-            ]
-        }
+    def get_equipment(self) -> Response:
         response = self.get(
-            "contract",
-            params=params
+            "contract/fvno/equipment"
         )
         assert response.status_code == HTTPStatus.OK
         assert response.json().get("contents")
-        # TODO добавить проверку ссылок из UPLOAD
         return response
 
-    def next(self, view: str) -> Response:
+    def alternative(self, view: str) -> Response:
         payload = {"from": view}
         response = self.post(
-            "contract/fvno/pdf-preview/next",
+            "contract/fvno/equipment/alternative",
             payload=payload
         )
         assert response.status_code == HTTPStatus.OK
         assert response.json().get("status") == "success"
         return response
+
+    def check_camunda_token(self):
+
+        response = self.get(
+            ""
+        )
+        activity_id = (response.json().get("childActivityInstances", {})[0]
+                       .get("childActivityInstances", {}))[0].get("activityId")
+        assert activity_id == "Gateway_0a1zk4n"

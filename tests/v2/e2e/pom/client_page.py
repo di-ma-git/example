@@ -1,6 +1,6 @@
 from http import HTTPStatus
 import json
-from tests.v2.pom.base_api import BaseAPI
+from common_api.base_api import BaseAPI
 from requests import Response, Session
 
 
