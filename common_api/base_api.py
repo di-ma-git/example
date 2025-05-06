@@ -1,4 +1,6 @@
+import json
 from http import HTTPStatus
+import random
 
 from requests import Response, Session
 from requests.adapters import HTTPAdapter
@@ -49,13 +51,20 @@ class BaseAPI:
         response.raise_for_status()
         return response
 
-    def post(self, path: str, payload: dict = None, data: str = None) -> Response:
+    def post(
+            self,
+            path: str,
+            params: dict = None,
+            payload: dict = None,
+            data: str = None
+    ) -> Response:
 
         if payload is not None:
             logger.info(f"POST request to {path} with payload {payload}")
             response = self.session.post(
                 f"{self.base_url}{path}",
                 headers=self.headers,
+                params=params,
                 json=payload,
                 verify=False
             )
@@ -68,6 +77,7 @@ class BaseAPI:
             response = self.session.post(
                 f"{self.base_url}{path}",
                 headers=self.headers,
+                params=params,
                 data=data,
                 verify=False
             )
@@ -79,6 +89,7 @@ class BaseAPI:
             response = self.session.post(
                 f"{self.base_url}{path}",
                 headers=self.headers,
+                params=params,
                 verify=False
             )
             logger.info(f"Response: {response}")
@@ -87,6 +98,56 @@ class BaseAPI:
 
     def step(self) -> Response:
         response = self.get("step")
+        assert response.status_code == HTTPStatus.OK
+        response.raise_for_status()
+        return response
+
+    def step_begin(self, task_id: str) -> Response:
+        response = self.get(
+            f"task/{task_id}/step"
+        )
+        assert response.status_code == HTTPStatus.OK
+        response.raise_for_status()
+        return response
+
+    def move(self, task_id: str, form_from: str) -> Response:
+        params = {"from": form_from}
+        response = self.post(
+            f"task/{task_id}/step/next",
+            params=params
+        )
+        assert response.status_code == HTTPStatus.OK
+        response.raise_for_status()
+        return response
+
+    def otp_sig(self, code: str, task_id: str) -> Response:
+        payload = {
+            "code": code,
+            "taskId": task_id
+        }
+        response = self.post(
+            "otp",
+            payload=payload
+        )
+        assert response.status_code == HTTPStatus.OK
+        response.raise_for_status()
+        return response
+
+    def save_form_fields(self, task_id: str, form_from: str) -> Response:
+        params = {"from": form_from}
+        data = {
+            "ip": {
+                "value": ".".join(str(random.randint(0, 254)) for _ in range(4))
+            },
+            "source": {
+                "value": random.choice(["web", "ecm"])
+            }
+        }
+        response = self.post(
+            f"task/{task_id}/step/next",
+            params=params,
+            data=json.dumps(data, ensure_ascii=False)
+        )
         assert response.status_code == HTTPStatus.OK
         response.raise_for_status()
         return response

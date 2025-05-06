@@ -13,7 +13,7 @@ class Create:
         mh = MultipartFormData.format(data=data, headers=Data.headers)
         url = urls.BASE_URL_DEV + urls.CREATE_TASK
         response = requests.request("POST", url, headers=Data.headers, data=mh, verify=False)
-        print(response.text)
+        print(f"Create response: {response.text}")
         if not response.json()["success"]:
             temp = response.json()["error"]
             url1 = url + temp['taskId'] + "/cancel?reason=OK"
@@ -22,7 +22,7 @@ class Create:
             mh = MultipartFormData.format(data=data, headers=Data.headers)
             url = urls.BASE_URL_DEV + urls.CREATE_TASK
             response = requests.request("POST", url, headers=Data.headers, data=mh, verify=False)
-            print(response.text)
+            print(f"Create response: {response.text}")
         url1 = url + response.json()["taskId"] + "/cancel?reason=OK"
         print(url1)
         requests.request("POST", url1, headers=Data.headers1, verify=False)
@@ -41,7 +41,7 @@ class Create:
         mh = MultipartFormData.format(data=data, headers=Data.headers)
         url = urls.BASE_URL_DEV + urls.CREATE_TASK_V3
         response = requests.request("POST", url, headers=Data.headers, data=mh, verify=False)
-        print(response.text)
+        print(f"Create response: {response.text}")
         if not response.json()["success"]:
             temp = response.json()["error"]
             url1 = url + temp['taskId'] + "/cancel?reason=OK"
@@ -50,7 +50,7 @@ class Create:
             mh = MultipartFormData.format(data=data, headers=Data.headers)
             url = urls.BASE_URL_DEV + urls.CREATE_TASK_V3
             response = requests.request("POST", url, headers=Data.headers, data=mh, verify=False)
-            print(response.text)
+            print(f"Create response: {response.text}")
         url1 = url + response.json()["taskId"] + "/cancel?reason=OK"
         print(url1)
         requests.request("POST", url1, headers=Data.headers1, verify=False)
@@ -70,7 +70,7 @@ class Create:
             mh = MultipartFormData.format(data=data, headers=Data.headers)
             url = urls.BASE_URL_DEV + urls.CREATE_TASK
             response = requests.request("POST", url, headers=Data.headers, data=mh, verify=False)
-            print(response.text)
+            print(f"Create response: {response.text}")
         return response
 
     @staticmethod
@@ -78,7 +78,7 @@ class Create:
         mh = MultipartFormData.format(data=data, headers=Data.headers)
         url = urls.BASE_URL_DEV + urls.CREATE_TASK_V3
         response = requests.request("POST", url, headers=Data.headers, data=mh, verify=False)
-        print(f"Upload response: {response.text}")
+        print(f"Create response: {response.text}")
         if not response.json()["success"]:
             temp = response.json()["error"]
             url1 = url + temp['taskId'] + "/cancel?reason=OK"
@@ -87,7 +87,7 @@ class Create:
             mh = MultipartFormData.format(data=data, headers=Data.headers)
             url = urls.BASE_URL_DEV + urls.CREATE_TASK_V3
             response = requests.request("POST", url, headers=Data.headers, data=mh, verify=False)
-            print(f"Upload response: {response.text}")
+            print(f"Create response: {response.text}")
         return response
 
     @staticmethod
@@ -97,7 +97,7 @@ class Create:
 
         url = urls.BASE_URL_DEV + urls.CREATE_TASK_V2
         response = requests.request("POST", url, headers=Data.headers, data=mh, verify=False)
-        print(f"Upload response: {response.text}")
+        print(f"Create response: {response.text}")
         if not response.json()["success"]:
             temp = response.json()["error"]
             url1 = url + temp['taskId'] + "/cancel?reason=OK"
@@ -106,7 +106,7 @@ class Create:
             mh = MultipartFormData.format(data=combined_data, headers=Data.headers)
             url = urls.BASE_URL_DEV + urls.CREATE_TASK_V2
             response = requests.request("POST", url, headers=Data.headers, data=mh, verify=False)
-            print(response.text)
+            print(f"Create response: {response.text}")
         url1 = url + response.json()["taskId"] + "/cancel?reason=OK"
         print(url1)
         requests.request("POST", url1, headers=Data.headers1, verify=False)
@@ -117,5 +117,5 @@ class Create:
         mh = MultipartFormData.format(data=data, headers=Data.headers)
         url = urls.BASE_URL_DEV + urls.CREATE_TASK
         response = requests.request("POST", url, headers=Data.headers, data=mh, verify=False)
-        print(f"Upload response: {response.text}")
+        print(f"Create response: {response.text}")
         return response

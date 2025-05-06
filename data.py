@@ -64,6 +64,121 @@ class MultipartFormData(object):
 
 
 class Data:
+    data_renewal_v3 = {
+        "data": {
+            "type": "RENEWAL",
+            "source": "CRM_URAL_V3",
+            "branch": "38",
+            "key": "300",
+            "identificationParameter": "PHONE",
+            "identificationValue": "9511111125",
+            "content": {
+                "contract": {
+                    "account": "452020383464",
+                    "paymentMethod": "CREDIT",
+                    "deliveryMethod": "EMAIL",
+                    "consentToReceiveAdvertising": "true",
+                    "consentToSmsInform": "false",
+                    "consentToUseSubscriberData": "false",
+                    "installerCode": "1234"
+                },
+                "client": {
+                    "name": "Дмитрий",
+                    "middleName": "Сергеевич",
+                    "surname": "Мальцев",
+                    "sex": "MALE",
+                    "nationality": "RUS",
+                    "inn": "",
+                    "snils": "",
+                    "codeWord": "ПРИВЕТ",
+                    "phone": "9307066090",
+                    "email": "maltsev.d@rt.ru"
+                },
+                "documents": [
+                    {
+                        "type": "PASSPORT_RU",
+                        "affiliation": "CLIENT",
+                        "series": "8016",
+                        "number": "123412",
+                        "departmentCode": "020-010",
+                        "placeOfIssue": "МВД Ленинского района",
+                        "dateOfIssue": "26.11.2011",
+                        "expirationDate": "26.11.2030",
+                        "dateOfBirth": "26.05.1991",
+                        "placeOfBirth": "г. Туапсе",
+                        "readOnly": None
+                    }
+                ],
+                "registrationAddress": {
+                    "globalId": "18302401",
+                    "zipCode": "363750",
+                    "region": "Реньюэл Респ Северная Осетия - Алания, Моздокский р-н переоформление УРАЛ",
+                    "town": "г Моздок",
+                    "street": "ул Ленина",
+                    "house": "18",
+                    "corpus": "5",
+                    "building": 1,
+                    "flat": "31",
+                    "suggestions": None,
+                    "manual": False
+                },
+                "installationAddress": {
+                    "globalId": "18302401",
+                    "zipCode": "363750",
+                    "region": "Респ Северная Осетия - Алания, Моздокский р-н",
+                    "town": "г Моздок",
+                    "street": "ул Тверская",
+                    "house": "0000",
+                    "corpus": "5",
+                    "building": "1",
+                    "flat": "23",
+                    "suggestions": None,
+                    "manual": False
+                },
+                "payment": {
+                    "account": "318010548796",
+                    "startPayment": 699,
+                    "link": "https://lk.rt.ru/new/#payment",
+                    "dateOfExpire": None,
+                    "firstPaymentDays": 4
+                },
+                "wfm": {
+                    "order": 1291320704,
+                    "equipments": [
+                        {
+                            "requirementId": "145171356",
+                            "equipmentName": "Wink",
+                            "categoryName": "ТВ-приставка Стандарт",
+                            "serialNumber": 8970120455900600000,
+                            "cpeOrderId": "145171354",
+                            "ModelName": "Wink",
+                            "nomenclatureCode": None,
+                            "usedOption": "ANY",
+                            "transferTermName": "Аренда (ЕПК)",
+                            "usedState": "Любой",
+                            "price": None,
+                            "warrantyEndDate": None
+                        },
+                        {
+                            "requirementId": "145171353",
+                            "equipmentName": "TP-Link TL-WR841N",
+                            "categoryName": "PON Медиум (Оптический модем с опцией WI-FI) (Medium) двухдиапазонный",
+                            "serialNumber": 2370120444900601000,
+                            "cpeOrderId": "145171351",
+                            "ModelName": "TP-Link TL-WR841N",
+                            "nomenclatureCode": None,
+                            "usedOption": "ANY",
+                            "transferTermName": "Аренда (ЕПК)",
+                            "usedState": "Любой",
+                            "price": None,
+                            "warrantyEndDate": None
+                        }
+                    ]
+                }
+            }
+        }
+    }
+
     data_wrapper = {
         "data": {
             "type": "SIGNING_DOCUMENTS_WRAPPER",
@@ -596,31 +711,3 @@ class Data:
     #     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
     #
     # }
-
-    data_upload_file_links_ural = \
-        [
-            {
-                "type": "MAINCONTRACT",
-                "link": "http://10.42.110.215:8759/ed-plug/file?id=dogovorTinkoff.pdf",
-                "displayName": "Договор",
-                "parameters": {
-                    "serviceId": [
-                        {
-                            "value": "3",
-                            "name": "шпд"
-                        }
-                    ],
-                    "clientName": "БУКИНА ЛЮБОВЬ АЛЕКСАНДРОВНА",
-                    "contractNumber": "13535425"
-                }
-            }
-        ]
-
-    data_upload_file_links = \
-        [
-            {
-                "type": "MAINCONTRACT",
-                "link": "http://10.42.110.215:8759/ed-plug/file?id=dogovorTinkoff.pdf",
-                "displayName": "Договор"
-            }
-        ]

@@ -2,15 +2,17 @@ from http import HTTPStatus
 
 from requests import Session, Response
 from common_api.base_api import BaseAPI
+from context import TestContext
 
 
 class EmployeeConfirmPage(BaseAPI):
     _response: dict
 
-    def __init__(self, session: Session):
+    def __init__(self, session: Session, test_context: TestContext):
         super().__init__(session)
+        self._test_context = test_context
 
-    def get_client_document(self) -> Response:
+    def get_client_document(self) -> 'EmployeeConfirmPage':
         params = {
             "fields[]": [
                 "middleName",
@@ -24,22 +26,22 @@ class EmployeeConfirmPage(BaseAPI):
         )
         assert response.status_code == HTTPStatus.OK
         assert response.json().get("contents")
-        return response
+        return self
 
-    def employee_confirm(self) -> Response:
+    def employee_confirm(self) -> 'EmployeeConfirmPage':
         response = self.get(
             "contract/fvno/employee-confirm"
         )
         assert response.status_code == HTTPStatus.OK
         assert response.json().get("contents")
-        return response
+        return self
 
-    def next(self, code: str, view: str) -> Response:
+    def next(self) -> 'EmployeeConfirmPage':
         payload = {
             "data": {
-                "code": code
+                "code": self._test_context.get_param("installer_code")
             },
-            "from": view
+            "from": self._test_context.get_param("current_view")
         }
         response = self.post(
             "contract/fvno/employee-confirm/next",
@@ -47,4 +49,4 @@ class EmployeeConfirmPage(BaseAPI):
         )
         assert response.status_code == HTTPStatus.OK
         assert response.json().get("status") == "success"
-        return response
+        return self

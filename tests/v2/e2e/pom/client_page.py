@@ -2,15 +2,16 @@ from http import HTTPStatus
 import json
 from common_api.base_api import BaseAPI
 from requests import Response, Session
-
+from context import TestContext
 
 class ClientPage(BaseAPI):
     _response: dict
 
-    def __init__(self, session: Session):
+    def __init__(self, session: Session, test_context: TestContext):
         super().__init__(session)
+        self._test_context = test_context
 
-    def get_client_fields(self) -> Response:
+    def get_client_fields(self) -> 'ClientPage':
         params = {
             "fields[]": [
                 "codeWord",
@@ -33,9 +34,9 @@ class ClientPage(BaseAPI):
         assert response.status_code == HTTPStatus.OK
         assert response.json().get("contents")
         self._response = response.json()
-        return response
+        return self
 
-    def next(self, view: str) -> Response:
+    def next(self) -> 'ClientPage':
         contents = self._response.get("contents")
 
         payload = {
@@ -52,7 +53,7 @@ class ClientPage(BaseAPI):
                 "snils": contents.get("snils", {}).get("value"),
                 "surname": contents.get("surname", {}).get("value")
             },
-            "from": view
+            "from": self._test_context.get_param("current_view")
         }
         payload_str = json.dumps(payload, ensure_ascii=False)
         response = self.post(
@@ -61,5 +62,5 @@ class ClientPage(BaseAPI):
         )
         assert response.status_code == HTTPStatus.OK
         assert response.json().get("status") == "success"
-        return response
+        return self
 
