@@ -2,8 +2,8 @@ import pytest
 
 from common_api.base_api import BaseAPI
 import urls
-from models.enums_form.renewal import RenewalFormUralV3
-from models.enums_form.secondary_documents import SecondaryDocumentsV3
+from models.form_enums.renewal import RenewalFormUralV3
+from models.form_enums.secondary_documents import SecondaryDocumentsV3
 from data import Data
 from camunda_checker import CamundaChecker
 from tests.v3.e2e.api.provide_api import ProvideAPI
@@ -33,6 +33,7 @@ class TestRenewalFast:
         self.base_api.move(test_context.get_param("task_id"), RenewalFormUralV3.URAL_RENEWAL_EFD_ADDRESS.value)
         self.base_api.move(test_context.get_param("task_id"), RenewalFormUralV3.URAL_RENEWAL_EFD_DELEVERY.value)
         self.base_api.move(test_context.get_param("task_id"), RenewalFormUralV3.URAL_RENEWAL_EFD_EMAIL_CONFIRM.value)
+        self.base_api.otp_gen(test_context.get_param("task_id"))
         self.base_api.otp_sig("333333", test_context.get_param("task_id"))
         self.base_api.save_form_fields(test_context.get_param("task_id"),
                                        RenewalFormUralV3.URAL_RENEWAL_EFD_SIGNATURE.value)

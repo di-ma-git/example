@@ -29,7 +29,7 @@ class TestCreate:
         with allure.step("Send request and check status"):
             response = Create.create_and_cancel_for_wrapper_v2(data, file_info)
 
-        with allure.step("Check json schema"):
+        with allure.step("Check response status"):
             assert response.status_code == HTTPStatus.CREATED and response.json() is not None
         with allure.step("Check json schema"):
             validate(instance=response.json(), schema=create_success_schema)

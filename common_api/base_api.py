@@ -120,7 +120,21 @@ class BaseAPI:
         response.raise_for_status()
         return response
 
+    def otp_gen(self, task_id: str) -> Response:
+        self.session.headers.update({"X-Real-Host": "devapp.ed.rt.ru"})
+        payload = {
+            "taskId": task_id
+        }
+        response = self.post(
+            "otp",
+            payload=payload
+        )
+        assert response.status_code == HTTPStatus.OK
+        response.raise_for_status()
+        return response
+
     def otp_sig(self, code: str, task_id: str) -> Response:
+        self.session.headers.update({"X-Real-Host": "devapp.ed.rt.ru"})
         payload = {
             "code": code,
             "taskId": task_id
@@ -144,7 +158,7 @@ class BaseAPI:
             }
         }
         response = self.post(
-            f"task/{task_id}/step/next",
+            f"task/{task_id}/form",
             params=params,
             data=json.dumps(data, ensure_ascii=False)
         )

@@ -3,6 +3,8 @@ import pytest
 from camunda_checker import CamundaChecker
 from common_api.base_api import BaseAPI
 from models.camunda_activities.fvno import FVNO
+from models.form_enums.secondary_documents import SecondaryDocumentsV3
+from models.form_enums.fvno import FvnoForm
 from tests.v2.e2e.pom.register_page import RegisterPage
 from tests.v2.e2e.pom.login_page import LoginPage
 from tests.v2.e2e.pom.offer_page import OfferPage
@@ -48,50 +50,51 @@ class TestE2EContractFvno:
     @pytest.mark.parametrize('provider_value', provider_value)
     def test_e2e_contract_fvno(self, task_repository, test_context, prepare_test_data_fvno):
 
-        with allure.step("Check status task is ACTIVE"):
+        with allure.step("Check task status is ACTIVE"):
             assert task_repository.get_task_status(test_context.get_param("task_id")) == "ACTIVE"
+
         with allure.step("Login"):
             self.register_page.register()
             self.login_page.login().find_task()
             step_view_response = self.login_page.step()
             test_context.set_param("current_view", step_view_response.json().get("contents", {}).get("view"))
-            assert test_context.get_param("current_view") == "FVNOOffer"
+            assert test_context.get_param("current_view") == FvnoForm.FVNO_OFFER
 
         with allure.step("Accept offer"):
             self.offer_page.settings().next()
             step_view_response = self.offer_page.step()
             test_context.set_param("current_view", step_view_response.json().get("contents", {}).get("view"))
-            assert test_context.get_param("current_view") == "FVNOClient"
+            assert test_context.get_param("current_view") == FvnoForm.FVNO_CLIENT
 
         with allure.step("Client check client data"):
             self.client_page.get_client_fields().next()
             step_view_response = self.client_page.step()
             test_context.set_param("current_view", step_view_response.json().get("contents", {}).get("view"))
-            assert test_context.get_param("current_view") == "FVNOEmailConfirm"
+            assert test_context.get_param("current_view") == FvnoForm.FVNO_EMAIL_CONFIRM
 
         with allure.step("Confirm email"):
             self.email_confirm_page.get_email().confirm_email().next()
             step_view_response = self.email_confirm_page.step()
             test_context.set_param("current_view", step_view_response.json().get("contents", {}).get("view"))
-            assert test_context.get_param("current_view") == "UniformDocumentPrimary"
+            assert test_context.get_param("current_view") == SecondaryDocumentsV3.UNIFORM_DOCUMENT_PRIMARY
 
         with allure.step("Client check passport data"):
             self.document_primary_page.get_nationality().get_document_primary().next()
             step_view_response = self.document_primary_page.step()
             test_context.set_param("current_view", step_view_response.json().get("contents", {}).get("view"))
-            assert test_context.get_param("current_view") == "FVNOAddress"
+            assert test_context.get_param("current_view") == FvnoForm.FVNO_ADDRESS
 
         with allure.step("Client check addresses"):
             self.address_page.get_addresses().next()
             step_view_response = self.address_page.step()
             test_context.set_param("current_view", step_view_response.json().get("contents", {}).get("view"))
-            assert test_context.get_param("current_view") == "FVNOEquipment"
+            assert test_context.get_param("current_view") == FvnoForm.FVNO_EQUIPMENT
 
         with allure.step("Client check transferred equipment"):
             self.equipment_page.get_equipment().alternative()
             step_view_response = self.equipment_page.step()
             test_context.set_param("current_view", step_view_response.json().get("contents", {}).get("view"))
-            assert test_context.get_param("current_view") == "FVNOWaiting"
+            assert test_context.get_param("current_view") == FvnoForm.FVNO_WAITING
 
         with allure.step("Send UPLOAD and wait 10 sec"):
             self.upload.send()
@@ -99,25 +102,25 @@ class TestE2EContractFvno:
         with allure.step("Waiting page"):
             step_view_response = self.waiting_page.step()
             test_context.set_param("current_view", step_view_response.json().get("contents", {}).get("view"))
-            assert test_context.get_param("current_view") == "FVNOPdfPreview"
+            assert test_context.get_param("current_view") == FvnoForm.FVNO_PDF_PREVIEW
 
         with allure.step("Show documents preview"):
             self.pdf_preview_page.get_files().next()
             step_view_response = self.document_primary_page.step()
             test_context.set_param("current_view", step_view_response.json().get("contents", {}).get("view"))
-            assert test_context.get_param("current_view") == "FVNOEmployeeConfirm"
+            assert test_context.get_param("current_view") == FvnoForm.FVNO_EMPLOYEE_CONFIRM
 
         with allure.step("Installer confirm client information is correct"):
             self.employee_confirm_page.get_client_document().employee_confirm().next()
             step_view_response = self.employee_confirm_page.step()
             test_context.set_param("current_view", step_view_response.json().get("contents", {}).get("view"))
-            assert test_context.get_param("current_view") == "FVNOSignature"
+            assert test_context.get_param("current_view") == FvnoForm.FVNO_SIGNATURE
 
         with allure.step("Client sign documents with sms code"):
             self.client_signature_page.signature().next()
             step_view_response = self.client_signature_page.step()
             test_context.set_param("current_view", step_view_response.json().get("contents", {}).get("view"))
-            assert test_context.get_param("current_view") == "FVNOComplete"
+            assert test_context.get_param("current_view") == FvnoForm.FVNO_COMPLETE
 
         with allure.step("Send UPLOAD and wait 10 sec"):
             self.upload.send()
